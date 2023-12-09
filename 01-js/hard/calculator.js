@@ -16,6 +16,118 @@
   Once you've implemented the logic, test your code by running
 */
 
-class Calculator {}
+class Calculator {
+  constructor() {
+    this.result = 0;
+  }
+
+  add(num) {
+    this.result += num;
+  }
+
+  subtract(num) {
+    this.result -= num;
+  }
+
+  multiply(num) {
+    this.result *= num;
+  }
+
+  divide(num) {
+    if (num === 0) {
+      throw new Error('Division by zero');
+    }
+    this.result /= num;
+  }
+
+  clear() {
+    this.result = 0;
+  }
+
+  getResult() {
+    return this.result;
+  }
+
+  calculate(expression) {
+    if (expression === '') {
+      return;
+    }
+
+    const expressionArray = expression.match(/(\d+\.?\d*|\+|\-|\*|\/|\(|\))/g);
+
+    if (!expressionArray || expressionArray.some(token => isNaN(token) && !['+', '-', '*', '/', '(', ')'].includes(token))) {
+      throw new Error('Invalid expression');
+    }
+
+    const operators = {
+      '+': (a, b) => a + b,
+      '-': (a, b) => a - b,
+      '*': (a, b) => a * b,
+      '/': (a, b) => {
+        if (b === 0) throw new Error('Division by zero');
+        return a / b;
+      }
+    };
+
+    const stack = [];
+    const output = [];
+
+    for (let i = 0; i < expressionArray.length; i++) {
+      const token = expressionArray[i];
+
+      if (!isNaN(token)) {
+        // If the token is a number, push it to the output stack
+        output.push(Number(token));
+      } else if (token === '(') {
+        stack.push(token);
+      } else if (token === ')') {
+        while (stack.length > 0 && stack[stack.length - 1] !== '(') {
+          output.push(stack.pop());
+        }
+        if (stack.length === 0 || stack.pop() !== '(') {
+          throw new Error('Invalid expression: mismatched parentheses');
+        }
+      } else if (operators.hasOwnProperty(token)) {
+        // Handle operators based on precedence
+        while (
+          stack.length > 0 &&
+          operators.hasOwnProperty(stack[stack.length - 1]) &&
+          operators[token] <= operators[stack[stack.length - 1]]
+        ) {
+          output.push(stack.pop());
+        }
+        stack.push(token);
+      }
+    }
+
+    while (stack.length > 0) {
+      if (stack[stack.length - 1] === '(' || stack[stack.length - 1] === ')') {
+        throw new Error('Invalid expression: mismatched parentheses');
+      }
+      output.push(stack.pop());
+    }
+
+    // Evaluate the expression using a stack
+    const evalStack = [];
+    for (let i = 0; i < output.length; i++) {
+      const token = output[i];
+      if (!isNaN(token)) {
+        evalStack.push(token);
+      } else if (operators.hasOwnProperty(token)) {
+        const operand2 = evalStack.pop();
+        const operand1 = evalStack.pop();
+        const result = operators[token](operand1, operand2);
+        evalStack.push(result);
+      }
+    }
+
+    if (evalStack.length !== 1) {
+      throw new Error('Invalid expression');
+    }
+
+    this.result = evalStack[0];
+    return this.result;
+  }
+}
 
 module.exports = Calculator;
