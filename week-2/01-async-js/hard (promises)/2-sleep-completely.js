@@ -16,7 +16,7 @@ function sleep(milliseconds) {
 }
 
 console.log("Start Sleeping")
-sleep(0.01)
+sleep(1)
     .then(() => {
         console.log("I am awake Now")
     })

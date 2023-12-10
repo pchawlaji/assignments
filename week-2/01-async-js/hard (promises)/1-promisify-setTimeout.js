@@ -7,7 +7,7 @@ function wait(n) {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             resolve(console.log(`I have waited for ${n} seconds`))
-         }, n * 1000)
+        }, n * 1000)
     })
 }
 

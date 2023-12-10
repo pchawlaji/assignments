@@ -34,8 +34,9 @@ function calculateTime(t1, t2, t3) {
         .then(() => wait3(t3))
         .then(() => {
             const endTime = new Date().getTime()
-            const timeDiff = (endTime - startTime) / 1000
+            const timeDiff = (endTime - startTime)
             console.log(timeDiff)
+            return timeDiff
         })
 }
 
