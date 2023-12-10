@@ -5,6 +5,20 @@
  */
 
 function sleep(milliseconds) {
+
+    return new Promise((resolve, reject) => {
+        const endTime = new Date().getTime() + milliseconds
+        while (new Date().getTime() <= endTime) {
+            console.log("I am Sleeping..Cant take new work")
+        }
+        resolve();
+    })
 }
+
+console.log("Start Sleeping")
+sleep(0.01)
+    .then(() => {
+        console.log("I am awake Now")
+    })
 
 module.exports = sleep;
