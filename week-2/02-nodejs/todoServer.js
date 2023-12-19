@@ -42,7 +42,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const z = require('zod');
+const fs = require('fs')
 const app = express();
+const path = require('path');
+const filePath = path.resolve('./todos.json');
 const todos = require('./todos.json')
 
 // Middleware
@@ -54,18 +57,22 @@ app.get("/todos", function (req, res) {
 });
 
 //Function to filter
-function filterTodo(id) {
-  if (id == id) {
-    return true
-  }
-  else {
-    return false
+function filterTodo(todo, id) {
+  if (todo.id == id) {
+    return true;
+  } else {
+    return false;
   }
 }
 
 //Get specific todo
 app.get("/todos/:id", function (req, res) {
-  const todo = todos.filter(filterTodo(id))
+
+  // Retrieve the id parameter from the request
+  const id = parseInt(req.params.id);
+
+  const todo = todos.filter((todo) => filterTodo(todo, id));
+  console.log(todo)
 
   if (todo.length >= 1) {
     res.status(200).send(todo);
@@ -79,36 +86,48 @@ app.get("/todos/:id", function (req, res) {
 //post a new todo
 app.post("/todos", function (req, res) {
 
+  //Create a schema
   const schema = z.object({
     title: z.string(),
     completed: z.boolean(),
     description: z.string()
   })
 
+  //parse the request body through schema
   const zValidation = schema.safeParse(req.body);
   console.log(zValidation)
 
-  if (zValidation.success) {
-    const todoLength = todos.length
-    const newId = todoLength + 1
-    
-    req.body["id"] = newId
-    todos.push[req.body]
-
-    console.log(todos)
-
-    res.status(201).json({
-      msg: "Success",
-      newTodo: todos.filter(filterTodo(newId))
-    })
-  }
-  else {
-    // Include the actual error messages in the response
+  //if schema is mis-matche
+  if (!zValidation.success) { // Include the actual error messages in the response
     res.status(400).json({ error: zValidation.error.errors, msg: "Please send details in proper format" });
+    return
   }
+
+  const todoLength = todos.length
+  const newId = todoLength + 1
+  console.log("newId: ", newId)
+
+  req.body["id"] = newId
+  console.log("newBody: ", req.body)
+  todos.push(req.body)
+
+  console.log(todos)
+
+  fs.writeFile(filePath, JSON.stringify(todos), (error) => {
+    if (error) {
+      console.error("Error writing to file:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    } else {
+      res.status(201).json({
+        data: {
+          msg: "Success",
+          newTodo: todos.filter((todo) => filterTodo(todo, newId))
+        }
+      });
+    }
+  });
 
 });
-
 
 
 app.listen(3000, () => {
