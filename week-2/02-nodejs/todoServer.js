@@ -39,11 +39,80 @@
 
   Testing the server - run `npm run test-todoServer` command in terminal
  */
-  const express = require('express');
-  const bodyParser = require('body-parser');
-  
-  const app = express();
-  
-  app.use(bodyParser.json());
-  
-  module.exports = app;
+const express = require('express');
+const bodyParser = require('body-parser');
+const z = require('zod');
+const app = express();
+const todos = require('./todos.json')
+
+// Middleware
+app.use(bodyParser.json());
+
+//Get all todos
+app.get("/todos", function (req, res) {
+  res.status(200).send(todos);
+});
+
+//Function to filter
+function filterTodo(id) {
+  if (id == id) {
+    return true
+  }
+  else {
+    return false
+  }
+}
+
+//Get specific todo
+app.get("/todos/:id", function (req, res) {
+  const todo = todos.filter(filterTodo(id))
+
+  if (todo.length >= 1) {
+    res.status(200).send(todo);
+  } else {
+    res.status(404).send("Not Found");
+  }
+
+});
+
+// { "title": "Buy groceries", "completed": false, description: "I should buy groceries" }
+//post a new todo
+app.post("/todos", function (req, res) {
+
+  const schema = z.object({
+    title: z.string(),
+    completed: z.boolean(),
+    description: z.string()
+  })
+
+  const zValidation = schema.safeParse(req.body);
+  console.log(zValidation)
+
+  if (zValidation.success) {
+    const todoLength = todos.length
+    const newId = todoLength + 1
+    
+    req.body["id"] = newId
+    todos.push[req.body]
+
+    console.log(todos)
+
+    res.status(201).json({
+      msg: "Success",
+      newTodo: todos.filter(filterTodo(newId))
+    })
+  }
+  else {
+    // Include the actual error messages in the response
+    res.status(400).json({ error: zValidation.error.errors, msg: "Please send details in proper format" });
+  }
+
+});
+
+
+
+app.listen(3000, () => {
+  console.log(`Example app listening on port 3000`)
+})
+
+module.exports = app;
