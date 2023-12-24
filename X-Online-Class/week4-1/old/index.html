@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<script>
+    function populateDiv() {
+        const a = document.getElementById("First").value
+        const b = document.getElementById("Second").value
+        const element = document.getElementById("finalSum") //.outerText = "hello World"
+
+        fetch(`https://sum-server.100xdevs.com/sum?a=${a}&b=${b}`).then((data) => {
+
+            data.text()
+                .then(function (ans) {
+                    element.innerHTML = ans
+                })
+        })
+    }
+
+    let timeout
+    //delay the call to populateDiv2 untill i have been called for 100ms
+    //and Ive been called atleast once
+    function debouncedPopulateDiv() {
+
+        //Clear previous timeout
+        clearTimeout(timeout)
+
+        //Add new timeout
+        timeout = setTimeout(() => {
+            populateDiv2()
+        }, 1000);
+
+    }
+
+    function debouncedPopulateDiv2() {
+
+        //Clear previous timeout
+        clearTimeout(timeout)
+
+        //Add new timeout
+        timeout = setTimeout(() => {
+            populateInterestDiv()
+        }, 1000);
+
+    }
+
+    async function populateDiv2() {
+        const a = document.getElementById("First").value
+        const b = document.getElementById("Second").value
+        const element = document.getElementById("finalSum") //.outerText = "hello World"
+
+        const resp = await fetch(`https://sum-server.100xdevs.com/sum?a=${a}&b=${b}`)
+        const ans = await resp.text()
+        element.innerHTML = ans
+    }
+
+
+    async function populateInterestDiv() {
+        const a = document.getElementById("principal").value
+        const b = document.getElementById("rate").value
+        const c = document.getElementById("time").value
+        const element = document.getElementById("finalInterest") //.outerText = "hello World"
+
+        const resp = await fetch(`http://localhost:3001/payment?princial=${a}&rate=${b}&time=${c}`)
+        const ans = await resp.json()
+        element.innerHTML = ans.payment
+    }
+</script>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <input oninput="debouncedPopulateDiv()" id="First" type="text" placeholder="First Number"></input></br></br>
+    <input oninput="debouncedPopulateDiv()" id="Second" type="text" placeholder="Second Number"></input></br></br>
+    <!-- <button onclick="populateDiv2()">Calculate Sum</button></br></br> -->
+    <div id="finalSum"></div>
+    </br></br>
+    </br></br>
+    <input oninput="debouncedPopulateDiv2()" id="principal" type="text" placeholder="principal"></input></br></br>
+    <input oninput="debouncedPopulateDiv2()" id="rate" type="text" placeholder="annual rate"></input></br></br>
+    <input oninput="debouncedPopulateDiv2()" id="time" type="text" placeholder="time in years"></input></br></br>
+    <div id="finalInterest"></div>
+</body>
+
+</html>

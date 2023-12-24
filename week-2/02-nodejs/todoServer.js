@@ -53,7 +53,7 @@ app.use(bodyParser.json());
 
 //Get all todos
 app.get("/todos", function (req, res) {
-  res.status(200).send(todos);
+  res.status(200).json({ data: todos });
 });
 
 //Function to filter
@@ -118,10 +118,97 @@ app.post("/todos", function (req, res) {
       console.error("Error writing to file:", error);
       res.status(500).json({ error: "Internal Server Error" });
     } else {
+      res.status(201).send(
+        // data: {
+        //   msg: "Success",
+        //   newTodo: todos.filter((todo) => filterTodo(todo, newId))[0]
+        // }
+        todos.filter((todo) => filterTodo(todo, newId))[0]
+      );
+    }
+  });
+
+});
+
+
+// { "title": "Buy groceries", "completed": false, description: "I should buy groceries" }
+//update an existing todo
+app.put("/todos/:id", function (req, res) {
+
+  //Create a schema
+  const schema = z.object({
+    title: z.string(),
+    completed: z.boolean(),
+    description: z.string()
+  })
+
+  //parse the request body through schema
+  const zValidation = schema.safeParse(req.body);
+  console.log(zValidation)
+
+  //if schema is mis-matche
+  if (!zValidation.success) { // Include the actual error messages in the response
+    res.status(400).json({ error: zValidation.error.errors, msg: "Please send details in proper format" });
+    return
+  }
+
+  //Find the id from URL which needs to be updated
+  const idToUpdate = req.params.id
+
+  //Find the item to update
+  const todo = todos.filter((todo) => filterTodo(todo, idToUpdate))[0]
+  console.log("todo: ", todo)
+
+  const indexOfTodo = todos.indexOf(todo)
+
+  //Run a loop on the input object body to update the todo item
+  for (const [key, value] of Object.entries(req.body)) {
+    console.log(`${key}: ${value}`);
+    todo[key] = value
+  }
+
+  console.log('updatedTodo: ', todo)
+
+  //Update the todo in the todos list
+  todos[indexOfTodo] = todo
+
+  fs.writeFile(filePath, JSON.stringify(todos), (error) => {
+    if (error) {
+      console.error("Error writing to file:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    } else {
       res.status(201).json({
         data: {
           msg: "Success",
-          newTodo: todos.filter((todo) => filterTodo(todo, newId))
+          newTodo: todos.filter((todo) => filterTodo(todo, idToUpdate))[0]
+        }
+      });
+    }
+  });
+
+});
+
+//Delete a todo
+app.delete("/todos/:id", function (req, res) {
+
+  //Find the id
+  const idToDelete = req.params.id
+  //Find the todo
+  const todo = todos.filter((todo) => filterTodo(todo, idToDelete))[0];
+  //Find its index
+  const indexOfTodo = todos.indexOf(todo);
+  //Remove the item from todos
+  todos.splice(indexOfTodo, 1)
+  //Update the todos
+  fs.writeFile(filePath, JSON.stringify(todos), (error) => {
+    if (error) {
+      console.error("Error writing to file:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    } else {
+      res.status(201).json({
+        data: {
+          msg: "Success",
+          updatedTodos: todos
         }
       });
     }

@@ -12,16 +12,45 @@ const app = express();
 // clears every one second
 
 let numberOfRequestsForUser = {};
+
 setInterval(() => {
-    numberOfRequestsForUser = {};
+  numberOfRequestsForUser = {};
 }, 1000)
 
-app.get('/user', function(req, res) {
+function ratelimiter(req, res, next) {
+
+  const userId = req.headers["user-id"]
+
+  console.log("userId: ", userId)
+
+  if (!userId) {
+    res.status(404).json({ error: 'user-id is missing in the headers' })
+    return
+  }
+
+  let existingUserAccessCount = numberOfRequestsForUser[userId] || 0;
+
+  console.log("existingUserAccessCount: ", existingUserAccessCount)
+
+  if (existingUserAccessCount >= 1) {
+    res.status(404).json({ error: "Access limit exceeded" })
+  } else {
+    numberOfRequestsForUser[userId] = existingUserAccessCount + 1
+    next()
+  }
+}
+
+app.use(ratelimiter)
+
+app.get('/user', function (req, res) {
   res.status(200).json({ name: 'john' });
 });
 
-app.post('/user', function(req, res) {
+app.post('/user', function (req, res) {
   res.status(200).json({ msg: 'created dummy user' });
 });
+
+
+app.listen(3000, () => { console.log("app is listening on port 3000") })
 
 module.exports = app;
