@@ -30,9 +30,7 @@ function ratelimiter(req, res, next) {
 
   let existingUserAccessCount = numberOfRequestsForUser[userId] || 0;
 
-  console.log("existingUserAccessCount: ", existingUserAccessCount)
-
-  if (existingUserAccessCount >= 1) {
+  if (existingUserAccessCount >= 5) {
     res.status(404).json({ error: "Access limit exceeded" })
   } else {
     numberOfRequestsForUser[userId] = existingUserAccessCount + 1
@@ -51,6 +49,6 @@ app.post('/user', function (req, res) {
 });
 
 
-app.listen(3000, () => { console.log("app is listening on port 3000") })
+//app.listen(3000, () => { console.log("app is listening on port 3000") })
 
 module.exports = app;

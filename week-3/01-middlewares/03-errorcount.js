@@ -26,11 +26,11 @@ app.get('/errorCount', function(req, res) {
 //Global catch
 app.use(function (err, req, res, next) {
   errorCount +=1
-    res.json({
+    res.status(404).json({
         error: "An error has occured"
     })
 })
 
-app.listen(3000, () => { console.log("app is now listing on port 3000") })
+//app.listen(3000, () => { console.log("app is now listing on port 3000") })
 
 module.exports = app;
