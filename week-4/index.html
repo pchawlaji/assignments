@@ -4,44 +4,114 @@
 <head>
   <script>
     let globalId = 1;
-    let todoState = [];
     let oldTodoState = [];
 
-    function addTodoToDom() {
-      
+    // Creates a new child element with the specified title, description, and id.
+    // 
+    // Parameters:
+    // - title: The title of the child element.
+    // - description: The description of the child element.
+    // - id: The id of the child element.
+    //
+    // Returns:
+    // The newly created child element.
+    function createChild({ title, description, status, id }) {
+
+      console.log("createChild function called with", { title, description, status, id });
+      // Create a new <div> element for the child.
+      const child = document.createElement("div");
+
+      // Create the first grandchild element, which is an <input> element of type "text".
+      const firstGrandChild = document.createElement("input");
+      firstGrandChild.type = "text";
+      firstGrandChild.setAttribute("id", `title-${id}`);
+      firstGrandChild.value = title;
+      // Append the first grandchild to the child element.
+      child.appendChild(firstGrandChild);
+
+      // Create the second grandchild element, which is an <input> element of type "text".
+      const secondGrandChild = document.createElement("input");
+      secondGrandChild.type = "text";
+      secondGrandChild.setAttribute("id", `description-${id}`);
+      secondGrandChild.value = description;
+      // Append the second grandchild to the child element.
+      child.appendChild(secondGrandChild);
+
+      // Create the third grandchild element, which is an <input> element of type "checkbox".
+      const thirdGrandChild = document.createElement("input");
+      thirdGrandChild.type = "checkbox";
+      thirdGrandChild.setAttribute("id", `checkbox-${id}`);
+      thirdGrandChild.setAttribute("onclick", `updateState({ ${id} })`);
+      thirdGrandChild.value = status;
+      // Append the third grandchild to the child element.
+      child.appendChild(thirdGrandChild);
+
+      // Create the fourth grandchild element, which is a <button> element of type "button".
+      const fourthGrandChild = document.createElement("button");
+      fourthGrandChild.type = "button";
+      fourthGrandChild.setAttribute("id", `update-button-${id}`);
+      fourthGrandChild.setAttribute("onclick", `updateState({ ${id} })`);
+      fourthGrandChild.innerHTML = 'Update';
+      // Append the fourth grandchild to the child element.
+      child.appendChild(fourthGrandChild);
+
+      // Set the id attribute of the child element.
+      child.setAttribute("id", id);
+      // Return the newly created child element.
+      return child;
+    }
+
+    function addTodoToDom(addedTodo) {
+      console.log("addedTodo function called with", addedTodo)
+      const parent = document.getElementById("todos");
+      parent.appendChild(createChild(addedTodo));
     }
 
     function removeTodoFromDom(todo) {
-      
+      const parent = document.getElementById("todos")
+      const child = parent.getElementById(todo.id)
+      parent.removeChild(child)
     }
 
-    function updateTodoInDom(oldTodo, newTodo) {
-        
+    function updateTodoInDom(id) {
+      const parent = document.getElementById("todos")
+      const child = parent.getElementById(id)
+      child.innerHTML = `${todo.id} - ${todo.title} - ${todo.description}`
     }
 
     function updateState(newTodos) {
-      // calculate the diff b/w newTodos and oldTodos.
-      // More specifically, find out what todos are - 
-      // 1. added
-      // 2. deleted
-      // 3. updated
-      const added = [];
-      const deleted = [];
-      const updated = [];
-      // calculate these 3 arrays
-      // call addTodo, removeTodo, updateTodo functions on each of the
-      // elements
-      oldTodoState = newTodos;
+
+      const addedTodos = [];
+      const updatedTodos = [];
+
+      // Check if newTodo exists in oldTodoState
+      if (!oldTodoState.includes(newTodo)) {
+        addedTodos.push(newTodo);
+      }
+
+      // Check if newTodo exists in oldTodoState
+      oldTodoState.forEach((todo) => {
+        if (todo.id === newTodo.id) {
+          updatedTodos.push(newTodo);
+        }
+      });
+
+      addedTodos.forEach(addTodoToDom);
+      updatedTodos.forEach(updateTodoInDom);
+
+      oldTodoState.push(newTodon);
     }
 
     function addTodo() {
       const title = document.getElementById("title").value;
       const description = document.getElementById("description").value;
-      todoState.push({
+      const newTodo = {
         title: title,
         description: description,
+        status: false,
         id: globalId++,
-      })
+      }
+      todoState.push(newTodo)
       updateState(todoState);
     }
   </script>
