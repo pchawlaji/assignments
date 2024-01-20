@@ -1,16 +1,21 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 
-// Create a component with a text input field and a button. The goal is to display an alert with the text entered when the button is clicked. Use useCallback to memoize the event handler function that triggers the alert, ensuring it's not recreated on every render.
+// Create a component with a text input field and a button. The goal is to display an alert with the text 
+//entered when the button is clicked. Use useCallback to memoize the event handler function that triggers the alert, 
+//ensuring it's not recreated on every render.
 // Currently we only have inputText as a state variable and hence you might not see the benefits of 
-// useCallback. We're also not passing it down to another component as a prop which is another reason for you to not see it's benefits immedietely.
+// useCallback. We're also not passing it down to another component as a prop which is another reason 
+//for you to not see it's benefits immedietely.
 
 export function Assignment2() {
     const [inputText, setInputText] = useState('');
 
     // Your code starts here
-    function showAlert() {
+    const showAlert = useCallback(() => {
+        alert(inputText)
+        document.getElementById('input').value = ''
+    }, [setInputText])
 
-    }
     // Your code ends here
 
     return (
@@ -20,13 +25,16 @@ export function Assignment2() {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Enter some text"
+                id="input"
             />
             <Alert showAlert={showAlert} />
         </div>
     );
 };
 
-function Alert({showAlert}) {
+const Alert = memo(({ showAlert }) => {
+    console.log('rendering alert');
     return <button onClick={showAlert}>Show Alert</button>
-}
+});
+
 
