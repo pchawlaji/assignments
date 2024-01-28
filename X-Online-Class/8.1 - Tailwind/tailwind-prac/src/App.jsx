@@ -1,29 +1,21 @@
-import { useState } from 'react'
-import './App.css'
+import "./App.css";
 
 function App() {
-
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-        <div style={{ backgroundColor: 'red' }}>Hi</div>
-        <div style={{ backgroundColor: 'blue' }}>Hi</div>
-        <div style={{ backgroundColor: 'yellow' }}>Hi</div>
+      <div style={{ display: "flex", justifyContent: "space-around" }}>
+        <div style={{ backgroundColor: "red" }}>Hi</div>
+        <div style={{ backgroundColor: "blue" }}>Hi</div>
+        <div style={{ backgroundColor: "yellow" }}>Hi</div>
       </div>
 
-      <div class="flex">
-        <div class="flex-none w-14 h-14">
-          01
-        </div>
-        <div class="flex-initial w-64 ...">
-          02
-        </div>
-        <div class="flex-initial w-32 ...">
-          03
-        </div>
+      <div className="grid md:grid-cols-3 sm:grid-cols-2 bg-slate-300">
+        <div className="bg-red-500 col-span-1">Hi</div>
+        <div className="bg-blue-500 col-span-1">Hi</div>
+        <div className="bg-green-500 col-span-1">Hi</div>
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
